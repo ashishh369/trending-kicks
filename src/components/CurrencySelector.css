@@ -1,0 +1,238 @@
+.currency-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+
+.currency-modal {
+  background: linear-gradient(135deg, #1e1e2e 0%, #2d2d44 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 40px 30px;
+  width: 100%;
+  max-width: 600px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.currency-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.globe-icon {
+  font-size: 48px;
+  color: #667eea;
+  margin-bottom: 15px;
+  animation: spin 3s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.currency-header h2 {
+  color: #fff;
+  margin: 0 0 10px 0;
+  font-size: 28px;
+}
+
+.currency-header p {
+  color: #aaa;
+  margin: 0;
+  font-size: 14px;
+}
+
+.currency-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.currency-option {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.currency-option:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(102, 126, 234, 0.5);
+  transform: translateY(-4px);
+}
+
+.currency-option.selected {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+  border-color: #667eea;
+  box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+}
+
+.currency-flag {
+  font-size: 32px;
+}
+
+.currency-code {
+  font-weight: 700;
+  font-size: 16px;
+  color: #667eea;
+}
+
+.currency-name {
+  font-size: 11px;
+  color: #aaa;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.currency-symbol {
+  font-size: 18px;
+  color: #667eea;
+  font-weight: 600;
+  opacity: 0.7;
+}
+
+.currency-confirm {
+  width: 100%;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.currency-confirm:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+}
+
+.currency-toggle {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  color: #fff;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+  z-index: 100;
+  gap: 5px;
+  font-weight: 600;
+  font-size: 12px;
+  flex-direction: column;
+  transition: all 0.3s ease;
+}
+
+.currency-toggle:hover {
+  box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+}
+
+.currency-toggle span {
+  font-size: 10px;
+}
+
+@media (max-width: 768px) {
+  .currency-modal {
+    padding: 30px 20px;
+  }
+
+  .currency-header h2 {
+    font-size: 24px;
+  }
+
+  .currency-grid {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 12px;
+  }
+
+  .currency-option {
+    padding: 15px;
+  }
+
+  .currency-flag {
+    font-size: 28px;
+  }
+
+  .currency-toggle {
+    bottom: 20px;
+    right: 20px;
+    width: 45px;
+    height: 45px;
+  }
+}
+
+@media (max-width: 480px) {
+  .currency-overlay {
+    padding: 10px;
+  }
+
+  .currency-modal {
+    padding: 20px 15px;
+    border-radius: 15px;
+  }
+
+  .currency-header h2 {
+    font-size: 20px;
+  }
+
+  .globe-icon {
+    font-size: 40px;
+  }
+
+  .currency-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .currency-option {
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .currency-flag {
+    font-size: 24px;
+  }
+
+  .currency-code {
+    font-size: 14px;
+  }
+
+  .currency-name {
+    font-size: 10px;
+  }
+}
