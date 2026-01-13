@@ -82,3 +82,51 @@ export const getStatesForCountry = (countryCode) => {
   const country = currencyToPostalCountry[countryCode] || 'US';
   return statesByCountry[country] || [];
 };
+
+// Map country names to country codes
+export const countryNameToCode = {
+  'United States': 'US',
+  'United Kingdom': 'UK',
+  'Canada': 'CA',
+  'Australia': 'AU',
+  'Japan': 'JP',
+  'China': 'CN',
+  'India': 'IN',
+  'Europe': 'EU',
+  'US': 'US',
+  'UK': 'UK',
+  'CA': 'CA',
+  'AU': 'AU',
+  'JP': 'JP',
+  'CN': 'CN',
+  'IN': 'IN',
+  'EU': 'EU',
+};
+
+// Get state/province by country name
+export const getStatesByCountryName = (countryName) => {
+  if (!countryName) return statesByCountry['US'] || [];
+  const normalized = countryName.trim().toUpperCase();
+  
+  // Direct lookup in countryNameToCode
+  let countryCode = countryNameToCode[countryName];
+  
+  // If not found, try normalized version
+  if (!countryCode) {
+    // Check if it's a country code itself
+    if (countryNameToCode[normalized]) {
+      countryCode = countryNameToCode[normalized];
+    } else {
+      // Try to match by key
+      for (const [key, value] of Object.entries(countryNameToCode)) {
+        if (key.toUpperCase() === normalized) {
+          countryCode = value;
+          break;
+        }
+      }
+    }
+  }
+  
+  countryCode = countryCode || 'US';
+  return statesByCountry[countryCode] || [];
+};

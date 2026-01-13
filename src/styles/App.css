@@ -1,3 +1,88 @@
+/* Prevent modal overflow on all devices */
+.checkout-container, .modal-content, .detail-modal {
+  max-width: 98vw !important;
+  max-height: 98vh !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+/* ---- ENHANCED MOBILE STYLES ---- */
+@media (max-width: 600px) {
+  html, body {
+    font-size: 15px;
+    background: linear-gradient(120deg, #f5f7fa 0%, #c3cfe2 100%);
+  }
+  .sneakers-grid {
+    padding: 0 0.5rem;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 0.7rem;
+  }
+  .sneaker-card {
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    padding: 0.7rem 0.7rem 1.2rem 0.7rem;
+    margin-bottom: 1.2rem;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(8px);
+    min-width: 0;
+  }
+  .sneaker-card img {
+    width: 100%;
+    height: 120px;
+    object-fit: contain;
+    border-radius: 12px;
+    background: #f5f7fa;
+  }
+  .sneaker-card h3 {
+    font-size: 1.1rem;
+    margin: 0.5rem 0 0.2rem 0;
+  }
+  .price {
+    font-size: 1.1rem;
+    color: #007bff;
+    font-weight: 600;
+  }
+  .rating {
+    font-size: 0.95rem;
+  }
+  .smart-tags {
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+  .btn-add-cart, .btn-view-details {
+    width: 100%;
+    margin: 0.3rem 0;
+    font-size: 1rem;
+    padding: 0.7rem 0;
+    border-radius: 10px;
+  }
+  .hero {
+    padding: 1.2rem 0.5rem;
+    min-height: 40vh;
+    text-align: center;
+  }
+  .hero h2 {
+    font-size: 1.3rem;
+  }
+  .hero p {
+    font-size: 0.95rem;
+  }
+  .modal-content {
+    padding: 1rem;
+    border-radius: 14px;
+    max-width: 99vw;
+  }
+  .close {
+    width: 28px;
+    height: 28px;
+    font-size: 1.2rem;
+  }
+  .footer-content {
+    padding: 1.2rem 0.5rem;
+    font-size: 0.95rem;
+  }
+}
 /* ============================================
    MODERN ANIMATIONS & RESPONSIVE DESIGN
    Trending Sneakers - Futuristic E-Commerce
@@ -950,6 +1035,31 @@ body.dark ::-webkit-scrollbar-track {
 body.dark .account-btn {
   background: rgba(102, 126, 234, 0.1);
   color: #667eea;
+}
+
+.admin-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.2rem;
+  border-radius: 8px;
+  background: rgba(255, 152, 0, 0.1);
+  color: #ff9800;
+  border: 1px solid rgba(255, 152, 0, 0.3);
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: var(--transition);
+}
+
+.admin-btn:hover {
+  background: rgba(255, 152, 0, 0.2);
+  border-color: #ff9800;
+  box-shadow: 0 0 15px rgba(255, 152, 0, 0.3);
+}
+
+body.dark .admin-btn {
+  background: rgba(255, 152, 0, 0.1);
+  color: #ff9800;
 }
 
 .cart-button {

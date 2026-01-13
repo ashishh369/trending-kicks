@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
+import { convertPrice } from '../utils/currencyRates';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaTrash, FaPlus, FaMinus, FaShoppingBag } from 'react-icons/fa';
 import CheckoutForm from './CheckoutForm';
 import { toast } from 'react-toastify';
 
-const CartModal = ({ show, onClose, cart, updateQuantity, currentCurrency = 'USD' }) => {
+const CartModal = ({ show, onClose, cart, updateQuantity, currentCurrency = 'USD', currencyRates = { USD: 1 } }) => {
   const [showCheckout, setShowCheckout] = useState(false);
 
   if (!show) return null;
@@ -110,7 +111,14 @@ const CartModal = ({ show, onClose, cart, updateQuantity, currentCurrency = 'USD
                       >
                         <div className="item-info">
                           <h4>{item.name}</h4>
-                          <p className="item-price">${item.price.toFixed(2)}</p>
+                          <p className="item-price">
+                            {currentCurrency === 'INR'
+                              ? `₹${convertPrice(item.price, 'USD', 'INR', currencyRates).toFixed(0)}`
+                              : currentCurrency === 'USD'
+                              ? `$${item.price.toFixed(2)}`
+                              : `${currentCurrency} ${convertPrice(item.price, 'USD', currentCurrency, currencyRates).toFixed(2)}`
+                            }
+                          </p>
                         </div>
 
                         <div className="quantity-controls">
@@ -143,7 +151,12 @@ const CartModal = ({ show, onClose, cart, updateQuantity, currentCurrency = 'USD
                         </div>
 
                         <p className="subtotal">
-                          ${(item.price * item.quantity).toFixed(2)}
+                          {currentCurrency === 'INR'
+                            ? `₹${convertPrice(item.price * item.quantity, 'USD', 'INR', currencyRates).toFixed(0)}`
+                            : currentCurrency === 'USD'
+                            ? `$${(item.price * item.quantity).toFixed(2)}`
+                            : `${currentCurrency} ${convertPrice(item.price * item.quantity, 'USD', currentCurrency, currencyRates).toFixed(2)}`
+                          }
                         </p>
 
                         <motion.button
@@ -177,7 +190,14 @@ const CartModal = ({ show, onClose, cart, updateQuantity, currentCurrency = 'USD
                 >
                   <div className="summary-row">
                     <span>Subtotal:</span>
-                    <span>${total.toFixed(2)}</span>
+                    <span>
+                      {currentCurrency === 'INR'
+                        ? `₹${convertPrice(total, 'USD', 'INR', currencyRates).toFixed(0)}`
+                        : currentCurrency === 'USD'
+                        ? `$${total.toFixed(2)}`
+                        : `${currentCurrency} ${convertPrice(total, 'USD', currentCurrency, currencyRates).toFixed(2)}`
+                      }
+                    </span>
                   </div>
                   <div className="summary-row">
                     <span>Shipping:</span>
@@ -185,7 +205,14 @@ const CartModal = ({ show, onClose, cart, updateQuantity, currentCurrency = 'USD
                   </div>
                   <div className="summary-row total-row">
                     <span>Total:</span>
-                    <span>${total.toFixed(2)}</span>
+                    <span>
+                      {currentCurrency === 'INR'
+                        ? `₹${convertPrice(total, 'USD', 'INR', currencyRates).toFixed(0)}`
+                        : currentCurrency === 'USD'
+                        ? `$${total.toFixed(2)}`
+                        : `${currentCurrency} ${convertPrice(total, 'USD', currentCurrency, currencyRates).toFixed(2)}`
+                      }
+                    </span>
                   </div>
                 </motion.div>
 
@@ -199,7 +226,12 @@ const CartModal = ({ show, onClose, cart, updateQuantity, currentCurrency = 'USD
                     marginTop: '1.5rem',
                   }}
                 >
-                  Checkout - ${total.toFixed(2)}
+                  Checkout - {currentCurrency === 'INR'
+                    ? `₹${convertPrice(total, 'USD', 'INR', currencyRates).toFixed(0)}`
+                    : currentCurrency === 'USD'
+                    ? `$${total.toFixed(2)}`
+                    : `${currentCurrency} ${convertPrice(total, 'USD', currentCurrency, currencyRates).toFixed(2)}`
+                  }
                 </motion.button>
               </motion.div>
             )}
@@ -221,6 +253,8 @@ const CartModal = ({ show, onClose, cart, updateQuantity, currentCurrency = 'USD
               status: 'pending',
               tracking: `TK${Date.now()}`,
               ...orderData,
+              currency: currentCurrency,
+              currencyRates: currencyRates,
             };
             orders.push(newOrder);
             localStorage.setItem('orders', JSON.stringify(orders));
@@ -231,6 +265,7 @@ const CartModal = ({ show, onClose, cart, updateQuantity, currentCurrency = 'USD
             toast.success('Order created successfully!');
           }}
           currentCurrency={currentCurrency}
+          currencyRates={currencyRates}
         />
       )}
     </AnimatePresence>

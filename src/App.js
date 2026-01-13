@@ -14,6 +14,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './styles/App.css';
 import { sneakersData } from './data/sneakersDatabase';
+import { getCurrencyRates, convertPrice } from './utils/currencyRates';
 
 function App() {
   const [cart, setCart] = useState(JSON.parse(localStorage.getItem('cart')) || []);
@@ -37,6 +38,14 @@ function App() {
     phone: '+1-800-000-0000',
     addresses: []
   });
+  const [currencyRates, setCurrencyRates] = useState({ USD: 1 });
+  useEffect(() => {
+    async function fetchRates() {
+      const rates = await getCurrencyRates();
+      setCurrencyRates(rates);
+    }
+    fetchRates();
+  }, [currentCurrency]);
 
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 300], [0, -50]); // Parallax effect
@@ -115,8 +124,8 @@ function App() {
       <div className="background-gradient" />
       <CurrencySelector 
         onSelectCurrency={(currency) => {
-          setCurrentCurrency(currency);
-          localStorage.setItem('currency', currency);
+          setCurrentCurrency(currency.code);
+          localStorage.setItem('currency', currency.code);
           localStorage.setItem('visited', 'true');
           setIsFirstVisit(false);
           toast.success(`Currency changed to ${currency}`);
@@ -138,19 +147,31 @@ function App() {
         <motion.div style={{ y }}>
           <Hero />
         </motion.div>
-        <SneakersGrid sneakers={filteredSneakers} onAddToCart={addToCart} onViewDetails={viewDetails} hasMore={hasMore} fetchMoreData={fetchMoreData} loading={loading} />
+        <SneakersGrid 
+          sneakers={filteredSneakers} 
+          onAddToCart={addToCart} 
+          onViewDetails={viewDetails} 
+          hasMore={hasMore} 
+          fetchMoreData={fetchMoreData} 
+          loading={loading}
+          currentCurrency={currentCurrency}
+          currencyRates={currencyRates}
+        />
         <CartModal 
           show={showCart} 
           onClose={() => setShowCart(false)} 
           cart={cart} 
           updateQuantity={updateQuantity}
           currentCurrency={currentCurrency}
+          currencyRates={currencyRates}
         />
         <DetailModal 
           show={showDetails} 
           onClose={() => setShowDetails(false)} 
           product={selectedProduct}
           onAddToCart={addToCart}
+          currentCurrency={currentCurrency}
+          currencyRates={currencyRates}
         />
         <AccountCenter 
           isOpen={showAccountCenter}
@@ -160,6 +181,10 @@ function App() {
           orders={orders}
           onUpdateOrders={setOrders}
           currency={currentCurrency}
+        />
+        <AdminPanel 
+          isOpen={showAdminPanel}
+          onClose={() => setShowAdminPanel(false)}
         />
         <Footer />
       </motion.div>

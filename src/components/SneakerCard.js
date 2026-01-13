@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FaStar, FaPlus, FaEye } from 'react-icons/fa';
+import { convertPrice } from '../utils/currencyRates';
 
-const SneakerCard = ({ sneaker, onAddToCart, onViewDetails }) => {
+const SneakerCard = ({ sneaker, onAddToCart, onViewDetails, currentCurrency = 'USD', currencyRates = { USD: 1 } }) => {
   const [isAdded, setIsAdded] = useState(false);
 
   const handleAddToCart = () => {
@@ -47,6 +48,8 @@ const SneakerCard = ({ sneaker, onAddToCart, onViewDetails }) => {
       <motion.div
         className="card-image-wrapper"
         whileHover={{ scale: 1.08 }}
+        onClick={() => onViewDetails(sneaker)}
+        style={{ cursor: 'pointer' }}
       >
         <motion.img
           src={sneaker.img}
@@ -114,7 +117,22 @@ const SneakerCard = ({ sneaker, onAddToCart, onViewDetails }) => {
           whileHover={{ scale: 1.1 }}
           transition={{ type: 'spring', stiffness: 400 }}
         >
-          ${sneaker.price}
+          {(() => {
+            const convertedPrice = convertPrice(sneaker.price, 'USD', currentCurrency, currencyRates);
+            const currencySymbols = {
+              USD: '$',
+              INR: '₹',
+              EUR: '€',
+              GBP: '£',
+              JPY: '¥',
+              AUD: 'A$',
+              CAD: 'C$',
+              CNY: '¥'
+            };
+            const symbol = currencySymbols[currentCurrency] || currentCurrency;
+            const decimals = currentCurrency === 'INR' ? 0 : 2;
+            return `${symbol}${convertedPrice.toFixed(decimals)}`;
+          })()}
         </motion.p>
 
         <div className="button-group">

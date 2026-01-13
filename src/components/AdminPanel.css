@@ -13,6 +13,103 @@
   backdrop-filter: blur(5px);
 }
 
+/* Password Authentication Modal */
+.admin-password-modal {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 20px;
+  padding: 60px 40px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  color: white;
+  position: relative;
+  text-align: center;
+}
+
+.admin-password-modal .close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+.password-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.lock-icon {
+  font-size: 60px;
+  opacity: 0.9;
+  margin-bottom: 10px;
+}
+
+.password-content h2 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.password-content p {
+  margin: 0;
+  opacity: 0.9;
+  font-size: 16px;
+}
+
+.password-content form {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.password-input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.password-input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.password-input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+.password-submit-btn {
+  padding: 12px 24px;
+  background: rgba(255, 255, 255, 0.25);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 16px;
+}
+
+.password-submit-btn:hover {
+  background: rgba(255, 255, 255, 0.35);
+  border-color: white;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.hint {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 10px !important;
+}
+
 .admin-container {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 20px;
@@ -38,6 +135,32 @@
   margin: 0;
   font-size: 28px;
   font-weight: 700;
+}
+
+.admin-header-buttons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.logout-btn {
+  background: rgba(255, 100, 100, 0.2);
+  border: 1px solid rgba(255, 100, 100, 0.4);
+  color: #ff6464;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.logout-btn:hover {
+  background: rgba(255, 100, 100, 0.3);
+  border-color: #ff6464;
 }
 
 .close-btn {
@@ -336,4 +459,68 @@ textarea.form-input {
 
 .admin-container::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.5);
+}
+/* Image Upload Section */
+.image-upload-section {
+  margin: 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.upload-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px dashed rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.upload-label:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.file-input {
+  display: none;
+}
+
+.image-preview {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.image-preview img {
+  max-width: 200px;
+  max-height: 200px;
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  object-fit: cover;
+}
+
+.remove-image-btn {
+  padding: 8px 16px;
+  background: rgba(255, 100, 100, 0.2);
+  border: 1px solid rgba(255, 100, 100, 0.4);
+  color: #ff6464;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.remove-image-btn:hover {
+  background: rgba(255, 100, 100, 0.3);
+  border-color: #ff6464;
 }

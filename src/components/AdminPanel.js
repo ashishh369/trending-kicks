@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaPlus, FaTrash, FaEdit, FaTimes, FaSave } from 'react-icons/fa';
+import { FaPlus, FaTrash, FaEdit, FaTimes, FaSave, FaLock, FaImage } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import './AdminPanel.css';
 
+// Hidden admin password (can be changed here - only dev knows)
+const ADMIN_PASSWORD_HASH = 'Shiva123'; // Simple password for demo
+
 const AdminPanel = ({ isOpen, onClose }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [passwordInput, setPasswordInput] = useState('');
   const [products, setProducts] = useState(() => {
     const saved = localStorage.getItem('customProducts');
     return saved ? JSON.parse(saved) : [];
@@ -14,6 +19,7 @@ const AdminPanel = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
     name: '',
     price: '',
+    discount: '0',
     img: '',
     rating: '',
     popularity: '',
@@ -30,6 +36,7 @@ const AdminPanel = ({ isOpen, onClose }) => {
     setFormData({
       name: '',
       price: '',
+      discount: '0',
       img: '',
       rating: '',
       popularity: '',
@@ -61,6 +68,7 @@ const AdminPanel = ({ isOpen, onClose }) => {
               ...p,
               name: formData.name,
               price: parseFloat(formData.price),
+              discount: parseFloat(formData.discount) || 0,
               img: formData.img,
               rating: parseFloat(formData.rating) || 4.5,
               popularity: formData.popularity || '80%',
@@ -78,6 +86,7 @@ const AdminPanel = ({ isOpen, onClose }) => {
         id: Date.now(),
         name: formData.name,
         price: parseFloat(formData.price),
+        discount: parseFloat(formData.discount) || 0,
         img: formData.img,
         rating: parseFloat(formData.rating) || 4.5,
         popularity: formData.popularity || '80%',
@@ -95,6 +104,7 @@ const AdminPanel = ({ isOpen, onClose }) => {
     setFormData({
       name: product.name,
       price: product.price.toString(),
+      discount: (product.discount || 0).toString(),
       img: product.img,
       rating: product.rating.toString(),
       popularity: product.popularity,
@@ -112,6 +122,81 @@ const AdminPanel = ({ isOpen, onClose }) => {
       toast.success('Product deleted successfully!');
     }
   };
+
+  const handlePasswordSubmit = (e) => {
+    e.preventDefault();
+    if (passwordInput === ADMIN_PASSWORD_HASH) {
+      setIsAuthenticated(true);
+      setPasswordInput('');
+      toast.success('Admin access granted! 🔐');
+    } else {
+      toast.error('Invalid password!');
+      setPasswordInput('');
+    }
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setFormData(prev => ({ ...prev, img: event.target.result }));
+        toast.success('Image uploaded successfully!');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setPasswordInput('');
+    onClose();
+    toast.info('Admin session closed');
+  };
+
+  // Password authentication screen
+  if (isOpen && !isAuthenticated) {
+    return (
+      <AnimatePresence>
+        <motion.div
+          className="admin-overlay"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <motion.div
+            className="admin-password-modal"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.8, opacity: 0 }}
+          >
+            <button className="close-btn" onClick={onClose}>
+              <FaTimes />
+            </button>
+            <div className="password-content">
+              <FaLock className="lock-icon" />
+              <h2>Admin Panel Access</h2>
+              <p>Enter admin password to continue</p>
+              <form onSubmit={handlePasswordSubmit}>
+                <input
+                  type="password"
+                  placeholder="Enter password"
+                  value={passwordInput}
+                  onChange={(e) => setPasswordInput(e.target.value)}
+                  autoFocus
+                  className="password-input"
+                />
+                <button type="submit" className="password-submit-btn">
+                  Unlock
+                </button>
+              </form>
+              <p className="hint">Demo: password = admin123</p>
+            </div>
+          </motion.div>
+        </motion.div>
+      </AnimatePresence>
+    );
+  }
 
   return (
     <AnimatePresence>
@@ -132,9 +217,14 @@ const AdminPanel = ({ isOpen, onClose }) => {
           >
             <div className="admin-header">
               <h2>🛠️ Admin Panel - Manage Products</h2>
-              <button className="close-btn" onClick={onClose}>
-                <FaTimes />
-              </button>
+              <div className="admin-header-buttons">
+                <button className="logout-btn" onClick={handleLogout} title="Logout">
+                  <FaLock /> Logout
+                </button>
+                <button className="close-btn" onClick={onClose}>
+                  <FaTimes />
+                </button>
+              </div>
             </div>
 
             <div className="admin-content">
@@ -157,6 +247,17 @@ const AdminPanel = ({ isOpen, onClose }) => {
                     value={formData.price}
                     onChange={handleInputChange}
                     className="form-input"
+                    step="0.01"
+                  />
+                  <input
+                    type="number"
+                    placeholder="Discount % (0-100)"
+                    name="discount"
+                    value={formData.discount}
+                    onChange={handleInputChange}
+                    className="form-input"
+                    min="0"
+                    max="100"
                     step="0.01"
                   />
                   <input
@@ -195,13 +296,39 @@ const AdminPanel = ({ isOpen, onClose }) => {
                     className="form-input"
                   />
                 </div>
+                
+                <div className="image-upload-section">
+                  <label className="upload-label">
+                    <FaImage /> Upload Product Image
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="file-input"
+                    />
+                  </label>
+                  {formData.img && (
+                    <div className="image-preview">
+                      <img src={formData.img} alt="Product preview" />
+                      <button
+                        type="button"
+                        className="remove-image-btn"
+                        onClick={() => setFormData(prev => ({ ...prev, img: '' }))}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  )}
+                </div>
+
                 <textarea
-                  placeholder="Image URL"
+                  placeholder="Image URL (or upload image above)"
                   name="img"
-                  value={formData.img}
+                  value={formData.img.substring(0, 100)}
                   onChange={handleInputChange}
                   className="form-input full-width"
                   rows="2"
+                  disabled
                 />
                 <textarea
                   placeholder="Reviews (comma-separated)"

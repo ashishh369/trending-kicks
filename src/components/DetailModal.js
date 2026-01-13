@@ -1,8 +1,9 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaStar, FaShare, FaHeart } from 'react-icons/fa';
+import { convertPrice } from '../utils/currencyRates';
 
-const DetailModal = ({ show, onClose, product }) => {
+const DetailModal = ({ show, onClose, product, currentCurrency = 'USD', currencyRates = { USD: 1 } }) => {
   const [isFavorited, setIsFavorited] = React.useState(false);
 
   if (!show || !product) {
@@ -141,7 +142,12 @@ const DetailModal = ({ show, onClose, product }) => {
                     marginBottom: '1.5rem',
                   }}
                 >
-                  ${product.price}
+                  {currentCurrency === 'INR'
+                    ? `₹${convertPrice(product.price, 'USD', 'INR', currencyRates).toFixed(0)}`
+                    : currentCurrency === 'USD'
+                    ? `$${product.price}`
+                    : `${currentCurrency} ${convertPrice(product.price, 'USD', currentCurrency, currencyRates).toFixed(2)}`
+                  }
                 </motion.p>
 
                 <motion.div

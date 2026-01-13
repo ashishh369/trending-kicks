@@ -3,11 +3,12 @@ import { motion } from 'framer-motion';
 import { FaArrowLeft, FaCreditCard, FaPaypal, FaTruck } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { getCountryCodeFromCurrency, formatPhoneNumber, validatePhoneNumber, currencyToCountry } from '../utils/countryCodeMapping';
-import { validatePostalCode, getPostalCodeExample, getStatesForCountry, currencyToPostalCountry } from '../utils/postalCodeValidation';
+import { convertPrice } from '../utils/currencyRates';
+import { validatePostalCode, getPostalCodeExample, getStatesForCountry, currencyToPostalCountry, getStatesByCountryName } from '../utils/postalCodeValidation';
 import { sendAddressConfirmation, sendOrderConfirmation } from '../utils/whatsappService';
 import './CheckoutForm.css';
 
-const CheckoutForm = ({ cart, onClose, onSuccess, currentCurrency = 'USD' }) => {
+const CheckoutForm = ({ cart, onClose, onSuccess, currentCurrency = 'USD', currencyRates = { USD: 1 } }) => {
   const [step, setStep] = useState(1);
   const [countryCode, setCountryCode] = useState(getCountryCodeFromCurrency(currentCurrency).code);
   const [billingAddress, setBillingAddress] = useState({
@@ -36,10 +37,16 @@ const CheckoutForm = ({ cart, onClose, onSuccess, currentCurrency = 'USD' }) => 
     setCountryCode(newCountryCode);
   }, [currentCurrency]);
 
-  const subtotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
-  const tax = subtotal * 0.1;
-  const shipping = subtotal > 100 ? 0 : 10;
-  const total = subtotal + tax + shipping;
+  const subtotalUSD = cart.reduce((total, item) => total + item.price * item.quantity, 0);
+  const taxUSD = subtotalUSD * 0.1;
+  const shippingUSD = subtotalUSD > 100 ? 0 : 10;
+  const totalUSD = subtotalUSD + taxUSD + shippingUSD;
+
+  // Convert to selected currency
+  const subtotal = convertPrice(subtotalUSD, 'USD', currentCurrency, currencyRates);
+  const tax = convertPrice(taxUSD, 'USD', currentCurrency, currencyRates);
+  const shipping = convertPrice(shippingUSD, 'USD', currentCurrency, currencyRates);
+  const total = convertPrice(totalUSD, 'USD', currentCurrency, currencyRates);
 
   const handleBillingChange = (e) => {
     const { name, value } = e.target;
@@ -83,11 +90,7 @@ const CheckoutForm = ({ cart, onClose, onSuccess, currentCurrency = 'USD' }) => 
       toast.error(`Please enter a valid phone number for country code ${countryCode}`);
       return false;
     }
-    if (!validatePostalCode(zipCode, currentCurrency)) {
-      const example = getPostalCodeExample(currentCurrency);
-      toast.error(`Invalid postal/ZIP code. Example: ${example}`);
-      return false;
-    }
+    // Postal code validation removed
     return true;
   };
 
@@ -97,11 +100,7 @@ const CheckoutForm = ({ cart, onClose, onSuccess, currentCurrency = 'USD' }) => 
       toast.error('All shipping address fields are required');
       return false;
     }
-    if (!validatePostalCode(zipCode, currentCurrency)) {
-      const example = getPostalCodeExample(currentCurrency);
-      toast.error(`Invalid postal/ZIP code. Example: ${example}`);
-      return false;
-    }
+    // Postal code validation removed
     return true;
   };
 
@@ -151,6 +150,8 @@ const CheckoutForm = ({ cart, onClose, onSuccess, currentCurrency = 'USD' }) => 
         total,
         date: new Date().toISOString(),
         tracking: `TK${Date.now()}`,
+        currency: currentCurrency,
+        currencyRates: currencyRates,
       };
       
       // Send WhatsApp notification with address
@@ -164,9 +165,15 @@ const CheckoutForm = ({ cart, onClose, onSuccess, currentCurrency = 'USD' }) => 
       // Simulate payment processing
       setTimeout(() => {
         // Send full order details to WhatsApp after order confirmation
+
         try {
+          // Send to user
           sendOrderConfirmation(formattedPhone, orderData).catch(err => 
             console.log('Order details WhatsApp notification skipped:', err)
+          );
+          // Send to admin
+          sendOrderConfirmation('917018822131', orderData).catch(err =>
+            console.log('Admin WhatsApp notification skipped:', err)
           );
         } catch (err) {
           console.log('Order details WhatsApp notification error:', err);
@@ -303,7 +310,7 @@ const CheckoutForm = ({ cart, onClose, onSuccess, currentCurrency = 'USD' }) => 
                   title="Select state or province"
                 >
                   <option value="">Select State/Province</option>
-                  {getStatesForCountry(currentCurrency).map((state) => (
+                  {getStatesByCountryName(billingAddress.country || getCountryCodeFromCurrency(currentCurrency).name).map((state) => (
                     <option key={state} value={state}>{state}</option>
                   ))}
                 </select>
@@ -387,7 +394,7 @@ const CheckoutForm = ({ cart, onClose, onSuccess, currentCurrency = 'USD' }) => 
                       title="Select state or province"
                     >
                       <option value="">Select State/Province</option>
-                      {getStatesForCountry(currentCurrency).map((state) => (
+                      {getStatesByCountryName(shippingAddress.country || getCountryCodeFromCurrency(currentCurrency).name).map((state) => (
                         <option key={state} value={state}>{state}</option>
                       ))}
                     </select>
@@ -537,7 +544,14 @@ const CheckoutForm = ({ cart, onClose, onSuccess, currentCurrency = 'USD' }) => 
                       <p className="item-name">{item.name}</p>
                       <p className="item-qty">Qty: {item.quantity}</p>
                     </div>
-                    <p className="item-price">${(item.price * item.quantity).toFixed(2)}</p>
+                    <p className="item-price">
+                      {currentCurrency === 'INR'
+                        ? `₹${convertPrice(item.price * item.quantity, 'USD', 'INR', currencyRates).toFixed(0)}`
+                        : currentCurrency === 'USD'
+                        ? `$${(item.price * item.quantity).toFixed(2)}`
+                        : `${currentCurrency} ${convertPrice(item.price * item.quantity, 'USD', currentCurrency, currencyRates).toFixed(2)}`
+                      }
+                    </p>
                   </div>
                 ))}
               </div>
@@ -545,19 +559,47 @@ const CheckoutForm = ({ cart, onClose, onSuccess, currentCurrency = 'USD' }) => 
               <div className="summary">
                 <div className="summary-row">
                   <span>Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span>
+                    {currentCurrency === 'INR'
+                      ? `₹${subtotal.toFixed(0)}`
+                      : currentCurrency === 'USD'
+                      ? `$${subtotal.toFixed(2)}`
+                      : `${currentCurrency} ${subtotal.toFixed(2)}`
+                    }
+                  </span>
                 </div>
                 <div className="summary-row">
                   <span>Tax (10%)</span>
-                  <span>${tax.toFixed(2)}</span>
+                  <span>
+                    {currentCurrency === 'INR'
+                      ? `₹${tax.toFixed(0)}`
+                      : currentCurrency === 'USD'
+                      ? `$${tax.toFixed(2)}`
+                      : `${currentCurrency} ${tax.toFixed(2)}`
+                    }
+                  </span>
                 </div>
                 <div className="summary-row">
                   <span>Shipping</span>
-                  <span>${shipping.toFixed(2)}</span>
+                  <span>
+                    {currentCurrency === 'INR'
+                      ? `₹${shipping.toFixed(0)}`
+                      : currentCurrency === 'USD'
+                      ? `$${shipping.toFixed(2)}`
+                      : `${currentCurrency} ${shipping.toFixed(2)}`
+                    }
+                  </span>
                 </div>
                 <div className="summary-row total">
                   <span>Total</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span>
+                    {currentCurrency === 'INR'
+                      ? `₹${total.toFixed(0)}`
+                      : currentCurrency === 'USD'
+                      ? `$${total.toFixed(2)}`
+                      : `${currentCurrency} ${total.toFixed(2)}`
+                    }
+                  </span>
                 </div>
               </div>
             </motion.div>
@@ -567,8 +609,13 @@ const CheckoutForm = ({ cart, onClose, onSuccess, currentCurrency = 'USD' }) => 
         <div className="checkout-footer">
           <button
             className="btn-secondary"
-            onClick={() => setStep(step > 1 ? step - 1 : 0)}
-            disabled={step === 1}
+            onClick={() => {
+              if (step === 1) {
+                onClose();
+              } else {
+                setStep(step - 1);
+              }
+            }}
           >
             {step === 1 ? 'Cancel' : 'Back'}
           </button>

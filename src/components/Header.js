@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FaMoon, FaSun, FaMicrophone, FaShoppingCart, FaMapMarkerAlt, FaUser } from 'react-icons/fa';
+import { FaMoon, FaSun, FaMicrophone, FaShoppingCart, FaMapMarkerAlt, FaUser, FaCog } from 'react-icons/fa';
 
-const Header = ({ cartCount, onCartClick, darkMode, toggleDarkMode, searchTerm, setSearchTerm, onAccountClick, currentCurrency = 'USD' }) => {
+const Header = ({ cartCount, onCartClick, darkMode, toggleDarkMode, searchTerm, setSearchTerm, onAccountClick, currentCurrency = 'USD', onAdminClick }) => {
   const [isListening, setIsListening] = useState(false);
   const [userLocation, setUserLocation] = useState('');
   const [showLocationMenu, setShowLocationMenu] = useState(false);
@@ -141,6 +141,17 @@ const Header = ({ cartCount, onCartClick, darkMode, toggleDarkMode, searchTerm, 
           >
             <FaUser />
             Account
+          </motion.button>
+
+          <motion.button
+            className="admin-btn"
+            onClick={onAdminClick}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            title="Admin Panel - Manage Products"
+          >
+            <FaCog />
+            Admin
           </motion.button>
 
           <motion.button
